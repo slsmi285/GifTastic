@@ -1,0 +1,19 @@
+#topic-form {
+    margin: 2em auto;
+}
+.btn-info {
+    margin: 2px;
+}
+.container-fluid {
+  background-color: darkgray;
+  height: auto;
+  margin-top: 20px;
+}
+h1 {
+    font-family: fantasy;
+    height: 75px;
+    padding-top: 10px;
+    text-decoration: rgb(204, 25, 135);
+    text-align: center;
+    border-bottom: 2px solid black
+}

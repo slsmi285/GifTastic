@@ -12,24 +12,127 @@
     //there is a submit button to the form
     //check with bootstrap to add this form -- vertical menu on the right
 
-$(document).ready() {
+$(document).ready() 
+   
+    //topics array
+    var topics = ["The Holiday", "Jumanji", "funny dogs", "Pipeline Surfers", "asian food", "James Cordon", "007", "Carpool Kareoke",
+        "Kentucky Derby", "boxer dog", "Meet the Parents", "Bridesmaids", "The Office", "Andy Griffith", "Hawaii five-O",
+        "Magnum PI", "Outlander", "hawaiian food", "Marvelous Mrs. Maisel", "Star Trek", "Star Wars", "Big Bang Theory",
+        "Funniest Videos", "Lipsync Battle", "Forrest Gump", "clydesdales", "Night at the Museum","giraffes"];
 
-    $(".gif").on("click", function() {
-
-
-
-        var state = $(this).data("state");
-
-
-        var stillImage = $(this).data("still");
-        var animatedImage = $(this).data("animate");
-
-    
+     //api key
+     var key = "teJTuCyxCldAJlcKZn3VFRwd9sf00UsT";
+    //still and animate
+    function animateThis(){
+        var state = $(this).attr("data-state");
+        //if image is still
         if(state === "still") {
-            $(this).data("state", "animate");
-            $(this).attr("src", animatedImage);
+            //setting url - switch
+            $(this).attr("src", $(this).attr("data-animate"));
+            //requesting animate
+            $(this).attr("data-state", "animate");
           } else {
-            $(this).data("state", "still");
-            $(this).attr("src", stillImage);
+              //switch to still
+              $(this).attr("src", $(this).attr("data-still"));
+              //image state
+              $(this).attr("data-state", "still");
           }
-}
+        }
+    
+
+    //ajax
+    function topicGiphy() {
+        $("#topicGifs").empty();
+        //variable storing data aname from the button clicked on
+        var topic = $(this).attr("data-name");
+        
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+          topic + "&api_key=" + key + "&limit=10";
+
+        //ajax method
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+          })
+
+
+        //then - promise - run this function
+          .then(function(response) {
+            //store returned object
+            var results = response.data;
+            //for array of data
+            for (var i = 0; i < results.length; i++) {
+                //for div
+              var topicDiv = $("<div>");
+                //add a giff class
+              topicDiv.addClass("gifs card bg-transparent border-light float-left");
+             
+              //var rating = results[i].rating;
+                //store a p element -- rating
+              var p = $('<p class = "blockquote-footer">').text("Rating: " + results[i].rating);
+                //for the images - element
+              var topicImage = $("<img>");
+                //still
+              topicImage.attr("src", results[i].images.fixed_height_still.url);
+              
+              //animate
+              topicImage.attr("data-animate", results[i].images.fixed_height.url);
+              //still
+              topicImage.attr("data-still", results[i].images.fixed_height_still.url);
+
+                //image state?
+              topicImage.attr("data-state", "still");
+              topicImage.addClass("gif img-responsive img-thumbnail rounded float-left img-fluid");
+                //addition image info - alt
+              topicImage.attr("alt", results[i].title);
+              topicDiv.append(topicImage);
+              topicDiv.append(p);
+                //add idv to the topic gif area
+              $("#topicGifs").prepend(topicDiv)
+
+            }
+          });
+    }
+      
+       
+
+        //buttons - creating the buttons
+        function createButton() {
+            
+            $("#buttons-view").empty();
+            //array of topics
+            for (var i = 0; i < topics.length; i++){
+                //for button
+                var j = $("<button>");
+                //for button - adding class
+                j.addClass("topic-btn btn btn-info");
+                j.attr("type", "button");
+                //adding name to button
+                j.attr("data-name", topics[i]);
+                j.text(topics[i]);
+                $("#buttons-view").append(j);
+            }
+        }
+        //on click or event listener??
+        $("#add-topic").on("click", function(event) {
+            //phil showed this -- prevent form from refreshing automatically
+            event.preventDefault();
+            //adding the new topic
+        var newTopic = $("#topic-input")
+            .val()
+            .trim();
+
+        if (newTopic === undefined || newTopic.length ==0) {
+            return;
+        } else {
+            topics.push(newTopic);
+            createButton();
+        }
+
+    });
+    //click on//event listener?? to topic buttons
+    $(document).on("click", ".topic-btn", topicGiphy);
+    //animate and still
+    $(document).on("click", ".gif", animateThis);
+
+    createButton();
